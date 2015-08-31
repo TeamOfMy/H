@@ -1,0 +1,17 @@
+{
+  "require":{
+      "nikic/fast-route":"*",
+      "twig/twig":"~1.0",
+      "illuminate/database": "*",
+      "symfony/http-foundation":"~2.4"
+  },
+  "autoload":{
+      "psr-4":{
+        "Core\\":"core/"
+      },
+      "classmap":[
+          "app/Models"
+      ]
+  }
+	
+}
