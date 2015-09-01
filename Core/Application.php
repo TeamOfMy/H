@@ -383,6 +383,8 @@ var_dump($controller);
         return $response;
     }
 
+
+
     /**
      * 注册GET 方式请求的路由到系统
      *
@@ -396,6 +398,22 @@ var_dump($controller);
 
         return $this;
     }
+
+    /**
+     * 注册POST 方式请求的路由到系统
+     *
+     * @param  string $uri
+     * @param  mixed $action
+     * @return $this
+     */
+    public function post($uri, $action)
+    {
+        $this->addRoute('POST', $uri, $action);
+
+        return $this;
+    }
+
+
 
     /**
      * 添加注册进来的路由到收集器中
@@ -525,25 +543,6 @@ var_dump($controller);
     }
 
     /**
-     * 配置和加载给定的组件和提供程序。
-     *
-     * @param  string $config
-     * @param  array|string $providers
-     * @param  string|null $return
-     * @return mixed
-     */
-    protected function loadComponent($config, $providers, $return = null)
-    {
-        $this->configure($config);
-
-        foreach ((array)$providers as $provider) {
-            $this->register($provider);
-        }
-
-        return $this->make($return ?: $config);
-    }
-
-    /**
      * 加载配置文件到系统中
      *
      * @param string $name 配的选项key名  如：database
@@ -557,7 +556,6 @@ var_dump($controller);
 
         $this->loadedConfigurations[$name] = true;
         $path = $this->getConfigurationPath($name);
-        var_dump($path);
         if ($path) {
             $this->make('config')->set($name, require $path);
         }

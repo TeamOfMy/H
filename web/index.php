@@ -1,7 +1,7 @@
 <?php
 
 
-// 定义web目录位置
+// 瀹氫箟web鐩綍浣嶇疆
 define('BASEDIR',__DIR__);
 
 $app = require BASEDIR . '/../App/app.php';
