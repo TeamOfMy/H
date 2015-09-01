@@ -7,5 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'SessionHandlerInterface' => $vendorDir . '/symfony/http-foundation/Resources/stubs/SessionHandlerInterface.php',
-    'Users' => $baseDir . '/app/Models/Users.php',
+    'Users' => $baseDir . '/App/Models/Users.php',
 );
