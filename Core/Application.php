@@ -184,10 +184,6 @@ class Application extends Container
         } else {
             echo (string)$response;
         }
-
-//        if (count($this->middleware) > 0) {
-//            $this->callTerminableMiddleware($response);
-//        }
     }
 
 
@@ -316,11 +312,11 @@ class Application extends Container
             return $this->prepareResponse($this->callControllerAction($routeInfo));
         }
 
-        // TODO　如果不是controller的方式的话 回调函数的处理
+        // TODO　如果不是controller的方式的话 function() 回调函数的处理
         foreach ($action as $value) {
-            // 如果是回调函数 直接就执行了
+            // 如果是回调函数 直接就执行了 TODO
             if ($value instanceof Closure) {
-                $closure = $value->bindTo(new Routing\Closure);
+                $closure = $value->bindTo(new \Core\Closure);
                 break;
             }
         }
@@ -627,9 +623,9 @@ var_dump($controller);
         $this->singleton('view', function () {
             $loader = new \Twig_Loader_Filesystem ($this->make('config')['template.template_dir']);
             return new \Twig_Environment ($loader, array (
-                'cache' => $this->config['cache_dir'],
-                'debug' => $this->config['debug'],
-                'auto_reload' => $this->config['auto_reload'],
+                'cache' => $this->make('config')['cache_dir'],
+                'debug' => $this->make('config')['debug'],
+                'auto_reload' => $this->make('config')['auto_reload'],
             ) );
 
         });
