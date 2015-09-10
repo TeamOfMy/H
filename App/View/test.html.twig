@@ -1,0 +1,9 @@
+tttttt
+
+{#<a href="{{  U('task_info',{'id':id}) }}">hhhhhhhhhhhh</a>#}
+{% for msg in data.items %}
+<p>{{ msg.content }}</p>
+{% endfor %}
+{% autoescape false %}
+<div>{{ data.render }}</div>
+{% endautoescape %}

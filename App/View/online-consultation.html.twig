@@ -1,0 +1,22 @@
+<script type="text/javascript">
+function _load(fun){//本函数检测文档是否加载完成，如果完成开始执行fun函数。
+    if (window.attachEvent){
+        window.attachEvent('onload', fun);
+    }else{
+        window.addEventListener('load', fun, false);
+    }
+}
+
+function async_load(src){//本函数执行脚本添加，参数src为脚本资源的地址。
+    var live800_script = document.createElement('script');
+    live800_script.type = 'text/javascript';
+    live800_script.async = true;
+    live800_script.src = src;
+    document.body.appendChild(live800_script);
+}
+
+_load(function(){
+    //执行加载'浮动图标代码'
+    async_load("http://njmm.livechatvalue.com/chat/chatClient/floatButton.js?jid=6811847595&companyID=410769&configID=40811&codeType=custom&delayload=1");
+});
+</script>

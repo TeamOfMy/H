@@ -3,7 +3,7 @@
 namespace Core;
 
 /**
- * 定义了一个空的闭包执行类 用于绑定闭包函数
+ * 瀹氫箟浜嗕竴涓┖鐨勯棴鍖呮墽琛岀被 鐢ㄤ簬缁戝畾闂寘鍑芥暟
  *
  * Class Closure
  * @package Core

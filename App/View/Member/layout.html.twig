@@ -1,0 +1,38 @@
+{% extends "layout.html.twig" %}
+{% block title %}会员中心{% endblock %}
+
+{% block content %}
+    <div class="head-line"></div>
+    <div class="inx-section clearfix">
+        <div class="doc-wrapper">
+            <div class="doc container">
+                <div class="doc-title">个人中心</div>
+                <div class="doc-content">
+                    <ul class="m-slide-menu clearfix">
+                        {% for item in menus_list %}
+                        <li {% if item.action==curmenu %} class="active"{% endif %}>
+                            <a href="/member/{{ item.action }}"> {{ item.name }}</a><b class="num"></b>
+
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    {% block right %}{% endblock %}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+{% endblock %}
+
+{% block javascript %}
+    <script  type="text/javascript" >
+        var base_url = '{{ base_url }}';
+    </script>
+
+    {% block subjavascript %}{% endblock %}
+{% endblock %}

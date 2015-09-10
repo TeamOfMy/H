@@ -1,0 +1,116 @@
+{% extends "layout.html.twig" %}
+{% block title %}排行榜{% endblock %}
+{% block head %}
+    <script type="text/javascript">
+        ued_import("rankCss", "css");
+    </script>
+{% endblock %}
+
+{% block content %}
+    <!-- 页面内容 -->
+    <div class="inx-section">
+        <div class="container">
+
+            <div class="rank-block">
+                <h1 class="rank-block_5">预约人气排行榜</h1>
+                <div class="rank-content rank-col J-tab clearfix" id="rank_appoint_month">
+
+                </div>
+            </div>
+
+            <div class="rank-block">
+                <h1 class="rank-block_15">赌圣排行榜</h1>
+                <div class="rank-content J-tab clearfix">
+                    <ul class="rank-menu clearfix J-tab-menu">
+                        <li class="active"><span>日排行榜</span></li>
+                        <li><span>周排行榜</span></li>
+                        <li><span>月排行榜</span></li>
+                        <li><span>总排行榜</span></li>
+                    </ul>
+
+                    <div id="rank_game_day" class="rank-menu_item active J-tab-main clearfix"></div>
+                    <div id="rank_game_week" class="rank-menu_item J-tab-main clearfix"></div>
+                    <div id="rank_game_month" class="rank-menu_item J-tab-main clearfix"></div>
+                    <div id="rank_game_his" class="rank-menu_item J-tab-main clearfix"></div>
+                </div>
+            </div>
+
+            <div class="rank-block">
+                <h1 class="rank-block_15">主播排行榜</h1>
+                <div class="rank-content J-tab clearfix">
+                    <ul class="rank-menu clearfix J-tab-menu">
+                        <li class="active"><span>日排行榜</span></li>
+                        <li><span>周排行榜</span></li>
+                        <li><span>月排行榜</span></li>
+                        <li><span>总排行榜</span></li>
+                    </ul>
+
+                    <div id="rank_exp_day" class="rank-menu_item active J-tab-main clearfix"></div>
+                    <div id="rank_exp_week" class="rank-menu_item J-tab-main clearfix"></div>
+                    <div id="rank_exp_month" class="rank-menu_item J-tab-main clearfix"></div>
+                    <div id="rank_exp_his" class="rank-menu_item J-tab-main clearfix"></div>
+                </div>
+            </div>
+
+            <div class="rank-block">
+                <h1 class="rank-block_15">富豪排行榜</h1>
+                <div class="rank-content J-tab clearfix">
+                    <ul class="rank-menu clearfix J-tab-menu">
+                        <li class="active"><span>日排行榜</span></li>
+                        <li><span>周排行榜</span></li>
+                        <li><span>月排行榜</span></li>
+                        <li><span>总排行榜</span></li>
+                    </ul>
+                    <div id="rank_rich_day" class="rank-menu_item J-tab-main active clearfix"></div>
+                    <div id="rank_rich_week" class="rank-menu_item J-tab-main clearfix"></div>
+                    <div id="rank_rich_month" class="rank-menu_item J-tab-main clearfix"></div>
+                    <div id="rank_rich_his" class="rank-menu_item J-tab-main clearfix"></div>
+                </div>
+
+            </div>
+            
+        </div>
+
+    </div>
+<!-- <div class="personDiv">
+    <div class="personContent clearfix">
+        <div class="personContent-top clearfix">
+            <img src="images/personIco.jpg" alt="" />
+            <div class="top-content">
+                <div class="longBox clearfix">
+                    <span>幵ミ心寶貝</span>
+                    <div class="hotListImg img2"></div>
+                </div>
+                <div class="longBox clearfix">
+                    <div class="hotListImg img1 visi"></div>
+                </div>
+            </div>
+        </div>
+        <div class="personContent-middle clearfix">
+            <div class="clearfix">
+                <span>女 | 24 | 水瓶座 | 河南省 郑州市 |</span>
+                <a href="#" class="personLink">
+                    <div  class="person-ico"></div>
+                    TA的空间
+                </a>
+            </div>
+            <p>不知道打啥随便打点字。。。。。。。</p>
+        </div>
+        <div class="personContent-bottom clearfix">
+            <div>+</div>
+            <a href="#">关注（468）</a>
+            <div class="mail"></div>
+            <a href="#" class="displayWinBtn">发私信</a>
+            <button class="redButton">进入房间</button>
+        </div>
+    </div>
+    <div class="arrow"></div>
+</div> -->
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    ued_import("rankJs", "js");
+</script>
+{% endblock %}

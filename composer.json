@@ -3,6 +3,8 @@
       "nikic/fast-route":"*",
       "twig/twig":"~1.0",
       "illuminate/database": "*",
+      "illuminate/pagination": "*",
+      "illuminate/events": "*",
       "symfony/http-foundation":"~2.4"
   },
   "autoload":{

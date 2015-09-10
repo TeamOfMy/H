@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'meta.html.twig' %}
+
+    <title>{% block title %}{% endblock %}</title>
+
+    <script type="text/javascript" src="{{ STATIC_PATH }}/dist/v2015082301/ued.import.js?v=1.0"></script>
+
+    <script type="text/javascript">
+        ued_import("commonCss", "css");
+    </script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+{% block contenthead %}{% endblock %}
+
+<!-- fix 头部 -->
+{% include 'header.html.twig' %}
+
+<div class="inx-wrapper">
+{% block content %}{% endblock %}
+</div>
+
+<!-- 绝对底部构建 -->
+{% include 'footer.html.twig' %}
+
+<!-- 隐藏窗口 -->
+{% block divhide %}{% endblock %}
+<script  type="text/javascript" >
+    //init
+    window.IMG_PATH = "{{ IMG_PATH }}";
+    window.JS_PATH = "http://" + location.hostname.replace(/www./,'v.');
+
+    //load lib
+    libImportJs();
+    ued_import("commonJs", "js");
+</script>
+{% block javascript %}{% endblock %}
+
+{% include 'online-consultation.html.twig' %}
+{% include 'google-analytics.html.twig' %}
+
+</body>
+</html>

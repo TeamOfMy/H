@@ -1,0 +1,59 @@
+<div class="inx-header">
+    <div class="container" id="headerInner">
+        <a href="/" class="headLogo"></a>
+
+        <ul class="headNav J-tab-menu" id="headNav">
+            <li><a href="/">首页</a><div class="headNavBg"></div></li>
+            <li><a href="/ranking">排行榜</a><div class="headNavBg"></div></li>
+            <li><a href="/viewmore.html?tag=all">美女直播</a><div class="headNavBg"></div></li>
+            <li><a href="/notice.html">活动中心</a><div class="headNavBg"></div></li>
+            <li><a href="/shop">商城</a><div class="headNavBg"></div></li>
+            <li><a href="/business/joining">招募</a><div class="headNavBg"></div></li>
+        </ul>
+
+        <ul class="headlogin" style="list-style: none;">
+            <li class="head-login-item">
+                <a href="javascript:void(0)" class="login">
+                    <div class="head-login-icon head-icon-login"></div>
+                    <div class="head-login-title">登录</div>
+                </a>
+            </li>
+            <li class="head-login-item">
+                <a href="javascript:void(0)" class="register">
+                    <div class="head-login-icon head-icon-reg"></div>
+                    <div class="head-login-title">注册</div>
+                </a>
+            </li>
+
+            <li class="head-login-item">
+                <a href="javascript:alert('请登录后再进行充值。');">
+                    <div class="head-login-icon head-icon-charge"></div>
+                    <div class="head-login-title">充值</div>
+                </a>
+            </li>
+            <li class="head-login-item">
+                <a href="/about/help">
+                    <div class="head-login-icon head-icon-help"></div>
+                    <div class="head-login-title">帮助</div>
+                </a>
+            </li>
+        </ul>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    var PAGE_HIGHT_MAPPING  = {'index':0, 'ranking':1, 'viewmore.html':2, 'notice.html':3, 'shop':4, 'business':5},
+        currentUrl = location.href.split('/');
+
+    if( !!currentUrl[3] && currentUrl[3] != '/' ){
+        //考虑带?, #的情况
+        currentUrl = currentUrl[3].replace(/[?#](.*)/g,'');
+    }else{
+        currentUrl = 'index';
+    }
+
+    if( PAGE_HIGHT_MAPPING[currentUrl] != null ){
+        document.getElementById('headNav').getElementsByTagName('li')[PAGE_HIGHT_MAPPING[currentUrl]].className += 'active';
+    }
+</script>

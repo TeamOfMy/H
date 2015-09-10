@@ -1,0 +1,59 @@
+{% extends "Member/layout.html.twig" %}
+
+{% block title %}私信{% endblock %}
+
+{% block head %}
+<script type="text/javascript">
+    ued_import("memberMsgCss", "css");
+</script>
+{% endblock %}
+
+{% block right %}
+
+<div class="perCenter">
+    <ul class="tab-title J-tab-menu clearfix" style="list-style: none;">
+        <a class="tab-item active" href="{{ U('member_msglist',{'type':2}) }}">
+            <span>{{ msglist2 }}</span>
+        </a>
+        <a class="tab-item" href="{{ U('member_msglist',{'type':1}) }}">
+            <span>{{ msglist1 }}</span>
+        </a>
+    </ul>
+    <div class="J-tab-main top-line active">
+        <ul class="messageList" id="personMenuTab">
+            {% for item in data %}
+            <li data-store='{"tid":{{ item.rec_uid }},"fid":{{ item.send_uid }},"id":{{ item.id }},"nickname":"{{ item.nickname }}" }'>
+                <dl>
+                    <dt class="clearfix">
+                        <input type="checkbox" />
+                    <div class="star{% if item.status == 1%}' active'{% endif %}"></div>
+                    <span class="list-name">{{ item.nickname }}</span>
+                    <span class="list-content">{{ item.content }}</span>
+                    <p class="list-tool">
+                        <span class="list-tool-reply displayWinBtn">回复</span>
+                        <span>|</span>
+                        <span class="list-tool-delete">删除</span>
+                    </p>
+                    <span class="list-time">{{ item.created | date('Y:m:d H:i:s') }}</span>
+                    </dt>
+                    <dd class="none">
+                      {{ item.content }}
+                    </dd>
+                </dl>
+            </li>
+            {% endfor %}
+        </ul>
+        {% autoescape false %}
+            <div  id="page" class="clearfix" style="float:right">{{ data.render }}</div>
+        {% endautoescape %}
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block subjavascript %}
+    <script type="text/javascript">
+        ued_import("memberMsgJs", "js");
+    </script>
+{% endblock %}

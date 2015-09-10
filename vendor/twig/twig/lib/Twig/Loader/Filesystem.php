@@ -30,7 +30,6 @@ class Twig_Loader_Filesystem implements Twig_LoaderInterface, Twig_ExistsLoaderI
      */
     public function __construct($paths = array())
     {
-        var_dump($paths);
         if ($paths) {
             $this->setPaths($paths);
         }

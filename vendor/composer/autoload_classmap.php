@@ -6,6 +6,8 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Models\\ActivityPag' => $baseDir . '/App/Models/ActivityPag.php',
+    'App\\Models\\Messages' => $baseDir . '/App/Models/Messages.php',
+    'App\\Models\\Users' => $baseDir . '/App/Models/Users.php',
     'SessionHandlerInterface' => $vendorDir . '/symfony/http-foundation/Resources/stubs/SessionHandlerInterface.php',
-    'Users' => $baseDir . '/App/Models/Users.php',
 );

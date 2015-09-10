@@ -1,0 +1,85 @@
+{% extends "layout.html.twig" %}
+
+{# 程序自定义标题 #}
+{% block title %}{{ activity.title }}{% endblock %}
+{# ############## #}
+
+{% block head %}
+    <style type="text/css">
+        body{
+            margin: 0px;
+        }
+        .ad-container{
+            padding: 0px;
+            width: 1000px;
+            margin: 0px auto;
+            position: relative;
+        }
+        .ad-content{
+            padding-bottom: 100px;
+        }
+
+        /* 由程序自定义颜色，如果未定义则为#fff */
+        .ad-wrapper{
+            background-color: {{ activity.bg}};
+        }
+        /**************************************/
+
+        .ad-main{
+
+        }
+
+        .ad-bg{
+            background-position: center center;
+            background-repeat: no-repeat;
+            height: 300px;
+            position: relative;
+        }
+
+        /* 由程序自定义loop模板 */
+        {% for image in activity.tmp %}
+        .ad-bg-{{ loop.index-1 }}{ background-image: url("{{ PICTURE_CDN_PATH }}/images/activity/{{ image }}"); }
+        {% endfor %}
+        /**************************************/
+
+    </style>
+
+
+{% endblock %}
+
+{% block content %}
+    <div class="inx-section">
+        <div class="ad-wrapper">
+            <div class="ad-main">
+
+                <!-- 程序自定义图片背景loop模板 -->
+                {% for image in activity.tmp %}
+                <div class="ad-bg ad-bg-{{ loop.index-1 }}"></div>
+                {% endfor %}
+                <!-- 程序自定义图片背景模板 -->
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    ued_import("pageCommonJs", "js");
+</script>
+
+<script type="text/javascript">
+window.onload = function(){
+    var $bgs = $(".ad-bg"),
+        bgLength = $bgs.length,
+        $lastBg = $bgs.eq(bgLength-1);
+
+    var bgImageUrl = $lastBg.css("backgroundImage").replace(/"/g,"").replace(/url\(|\)$/ig, "");
+
+    var img = new Image();
+    img.src = bgImageUrl;
+
+    $lastBg.height(img.height);
+}
+</script>
+{% endblock %}

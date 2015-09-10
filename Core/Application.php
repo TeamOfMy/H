@@ -4,6 +4,7 @@ namespace Core;
 
 use Closure;
 use Core\Config\Repository;
+use Core\Route\Url;
 use Exception;
 use ErrorException;
 use FastRoute\Dispatcher;
@@ -11,6 +12,8 @@ use FastRoute\Dispatcher;
 use Illuminate\Container\Container;
 
 // 使用symfony的请求和响应类
+use Illuminate\Database\DatabaseServiceProvider;
+use Illuminate\Support\ServiceProvider;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -21,16 +24,38 @@ class Application extends Container
      * @var Request
      */
     protected $request;
+    /**
+     * 路由
+     * @var
+     */
     protected $router;
 
+    /**
+     * 分发
+     *
+     * @var
+     */
     protected $dispatcher;
 
     /**
-     * All of the routes waiting to be registered.
+     * 路由的分组 做到可以简写controller的名字
+     * @var
+     */
+    protected $groupAttributes;
+    /**
+     * 注册所有的路由
      *
      * @var array
      */
     protected $routes = [];
+
+    /**
+     * 路由名称对应的路由
+     *
+     * @var
+     */
+    public $namedRoutes;
+
     /**
      * 已执行过的 服务绑定方法
      *
@@ -38,9 +63,23 @@ class Application extends Container
      */
     protected $ranServiceBinders = [];
 
+    /**
+     * 加载过的配置的路径
+     * @var
+     */
     protected $configPath;
 
+    /**
+     * 应用默认路径
+     * @var
+     */
     protected $basePath;
+
+    /**
+     * 加载过的服务注册器
+     * @var array
+     */
+    protected $loadedProviders = [];
 
     /**
      * 记录那些 加载过 的配置选项
@@ -56,8 +95,12 @@ class Application extends Container
 //        date_default_timezone_set(env('APP_TIMEZONE', 'UTC'));
 
 //        $this->basePath = $basePath;
+        // 实例化本身的容器
         $this->bootstrapContainer();
+        // 注册错误处理的 工具
         $this->registerErrorHandling();
+        // 加载配置文件config.php
+        $this->configure('config');
     }
 
     /**
@@ -166,7 +209,6 @@ class Application extends Container
         return parent::make($abstract, $parameters);
     }
 
-
     /**
      * 运行应用程序和发送响应 系统的核心部分
      *
@@ -175,6 +217,13 @@ class Application extends Container
      */
     public function goRun($request = null)
     {
+        // TODO 修改session机制
+        $domain = explode('.', $_SERVER['HTTP_HOST']);
+        $len = count($domain);
+        $_W['v_remember_encrypt'] = '.' . $domain[$len - 2] . '.' . $domain[$len - 1];//将domain注册到配置文件
+        ini_set('session.cookie_domain', $_W['v_remember_encrypt']);//限制二级域名;
+        session_start();
+
         // TODO 处理request的扩展性 支持其他的request
         $request = $this->make('request');
 
@@ -186,7 +235,6 @@ class Application extends Container
         }
     }
 
-
     /**
      * 分发请求
      *
@@ -195,19 +243,16 @@ class Application extends Container
      */
     public function dispatch($request = null)
     {
-        if ($request) {
+        if (!$request) {
             $this->instance('Illuminate\Http\Request', $request);
             $this->ranServiceBinders['registerRequestBindings'] = true;
 
             $method = $request->getMethod();
-            $pathInfo = $request->getPathInfo();
+            $pathInfo = rtrim($request->getPathInfo(),'/');
         } else {
             $method = $this->getMethod();
             $pathInfo = $this->getPathInfo();
         }
-
-        var_dump($method);
-        var_dump($pathInfo);
         try {
             // 非传参数类的路由直接调用 提高效率  如 /task
             if (isset($this->routes[$method . $pathInfo])) {
@@ -216,12 +261,10 @@ class Application extends Container
                 // 根据匹配去调用路由  /task/end/(123)
                 return $this->handleDispatcherResponse(
                 // 调用 fastRoute 类 进行匹配
-                    $this->createDispatcher()->dispatch($method, $pathInfo)
-                );
+                    $this->createDispatcher()->dispatch($method, $pathInfo));
             }
 
         } catch (Exception $e) {
-            var_dump($e);
             return $this->sendExceptionToHandler($e);
         }
     }
@@ -257,7 +300,6 @@ class Application extends Container
         return $handler->render($this->make('request'), $e);
     }
 
-
     /**
      * 从FastRoute 分发结果类型来处理响应
      *
@@ -280,7 +322,6 @@ class Application extends Container
                 return $this->handleFoundRoute($routeInfo);
         }
     }
-
 
     /**
      * 根据路由去触发程序
@@ -312,11 +353,11 @@ class Application extends Container
             return $this->prepareResponse($this->callControllerAction($routeInfo));
         }
 
-        // TODO　如果不是controller的方式的话 function() 回调函数的处理
+        // TODO　如果不是controller的方式的话 回调函数的处理
         foreach ($action as $value) {
-            // 如果是回调函数 直接就执行了 TODO
+            // 如果是回调函数 直接就执行了
             if ($value instanceof Closure) {
-                $closure = $value->bindTo(new \Core\Closure);
+                $closure = $value->bindTo(new Route\Closure);
                 break;
             }
         }
@@ -337,7 +378,7 @@ class Application extends Container
     protected function callControllerAction($routeInfo)
     {
         list($controller, $method) = explode('@', $routeInfo[1]['uses']);
-var_dump($controller);
+
         if (!method_exists($instance = $this->make($controller), $method)) {
             throw new NotFoundHttpException;
         }
@@ -366,7 +407,6 @@ var_dump($controller);
         }
     }
 
-
     /**
      * 准备发送的响应。
      *
@@ -382,8 +422,6 @@ var_dump($controller);
         }
         return $response;
     }
-
-
 
     /**
      * 注册GET 方式请求的路由到系统
@@ -413,8 +451,6 @@ var_dump($controller);
         return $this;
     }
 
-
-
     /**
      * 添加注册进来的路由到收集器中
      * $this->routes 就是收集器
@@ -443,6 +479,15 @@ var_dump($controller);
         }
 
         $this->routes[$method . $uri] = ['method' => $method, 'uri' => $uri, 'action' => $action];
+    }
+
+    protected function mergeGroupAttributes(array $action)
+    {
+        if (isset($this->groupAttributes['namespace']) && isset($action['uses'])) {
+            $action['uses'] = $this->groupAttributes['namespace'] . '\\' . $action['uses'];
+        }
+
+        return $action;
     }
 
     /**
@@ -515,7 +560,6 @@ var_dump($controller);
         return in_array($type, [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE]);
     }
 
-
     /**
      * 注册错误处理器
      *
@@ -538,7 +582,7 @@ var_dump($controller);
     protected function registerRequestBindings()
     {
         $this->singleton('request', function () {
-            return SymfonyRequest::createFromGlobals();
+            return Request::createFromGlobals();
         });
     }
 
@@ -559,6 +603,50 @@ var_dump($controller);
         if ($path) {
             $this->make('config')->set($name, require $path);
         }
+    }
+
+    /**
+     * 通过配置和注册器注册相应的服务
+     *
+     * @param  string $config
+     * @param  array|string $providers
+     * @param  string|null $return
+     * @return mixed
+     */
+    protected function loadComponent($config, $providers, $return = null)
+    {
+        $this->configure($config);
+
+        foreach ((array)$providers as $provider) {
+            $this->register($provider);
+        }
+
+        return $this->make($return ?: $config);
+    }
+
+    /**
+     * 同构服务注册器注册服务到系统中
+     *
+     * @param  \Illuminate\Support\ServiceProvider|string $provider
+     * @param  array $options
+     * @param  bool $force
+     * @return \Illuminate\Support\ServiceProvider
+     */
+    public function register($provider, $options = [], $force = false)
+    {
+        // 调用illuminate 的服务注册器，会注入本类的
+        if (!$provider instanceof ServiceProvider) {
+            $provider = new $provider($this);
+        }
+
+        if (array_key_exists($providerName = get_class($provider), $this->loadedProviders)) {
+            return;
+        }
+
+        $this->loadedProviders[$providerName] = true;
+
+        $provider->register();
+        $provider->boot();
     }
 
     /**
@@ -619,16 +707,44 @@ var_dump($controller);
     {
         $this->configure('template');
         $this->singleton('view', function () {
-            $loader = new \Twig_Loader_Filesystem ($this->make('config')['template.template_dir']);
-            return new \Twig_Environment ($loader, array (
-                'cache' => $this->make('config')['cache_dir'],
+            $loader = new \Twig_Loader_Filesystem ($this->config['template.template_dir']);
+            $twig = new \Twig_Environment ($loader, array(
+                'cache' => $this->config['template.cache_dir'],
                 'debug' => $this->make('config')['debug'],
                 'auto_reload' => $this->make('config')['auto_reload'],
-            ) );
+            ));
+
+            // 注册常用的全局变量到twig中 {{__CSS__}}
+//            $twig->addGlobal('__CSS__', BASEDIR . '/App/Public/css');
+//            $twig->addGlobal('__JS__', BASEDIR . '/App/Public/js');
+//            $twig->addGlobal('__IMAGE__', BASEDIR . '/App/Public/image');
+
+            $twig->addGlobal('STATIC_PATH', $this->config['config.WEB_CDN_STATIC']);
+            $twig->addGlobal('IMG_PATH', $this->config['config.REMOTE_PIC_URL']);
+            $twig->addGlobal('PICTURE_CDN_PATH', $this->config['config.PIC_CDN_STATIC']);
+
+            // 注册到twig中的自定义的函数 可以注册很多个
+
+            // 注册url生成函数 U
+            $url = new \Twig_SimpleFunction('U', array($this->make('url'), 'route'));
+            $twig->addFunction($url);
+
+            return $twig;
 
         });
     }
 
+    /**
+     * 注册Url构建组件
+     * 用于构建一个url生成的类方法
+     *
+     */
+    protected function registerUrlBindings()
+    {
+        $this->singleton('url', function () {
+            return new Url($this);
+        });
+    }
 
     /**
      * 注册 DB 到容器中
@@ -637,12 +753,50 @@ var_dump($controller);
      */
     protected function registerDatabaseBindings()
     {
-        $this->configure('database');
+        // TODO 临时做了一个兼容原来配置的转换 以后要统一的
+        $db = array(
+            'default' => 'mysql',
+        );
+        $default = array(
+            'driver' => 'mysql',
+            'host' => $this->config['config.database_host'],
+            'database' => $this->config['config.database_name'],
+            'username' => $this->config['config.database_user'],
+            'password' => $this->config['config.database_password'],
+            'port' => $this->config['config.database_port'],
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix' => '',
+        );
+        $this->config['database'] = $db;
+        $this->config['database.connections.mysql'] = $default;
+        $this->loadedConfigurations['database'] = true;
+
         $this->singleton('db', function () {
-            $capsule =  new \Illuminate\Database\Capsule\Manager($this);
-            $capsule->addConnection($this->make('config')['database']);
-            $capsule->setAsGlobal();
-            $capsule->bootEloquent();
+            $this->loadComponent('database', [
+                'Illuminate\Database\DatabaseServiceProvider',
+                'Illuminate\Pagination\PaginationServiceProvider'],
+                'db');
+        });
+//        $this->singleton('db', function ()use($db) {
+//            $capsule = new \Illuminate\Database\Capsule\Manager();
+//            $capsule->addConnection($db);
+//            $capsule->setAsGlobal();
+//            $capsule->bootEloquent();
+//        });
+    }
+
+    /**
+     * 注册事件出发去
+     *
+     * @return void
+     */
+    protected function registerEventBindings()
+    {
+        $this->singleton('events', function () {
+            $this->register('Illuminate\Events\EventServiceProvider');
+
+            return $this->make('events');
         });
     }
 
@@ -656,10 +810,8 @@ var_dump($controller);
         $this->aliases = [
             'Core\Config\Repository' => 'config',
             'Illuminate\Container\Container' => 'app',
-//            'Illuminate\Contracts\Redis\Database' => 'redis',
         ];
     }
-
 
     /**
      * 可用容器绑定及其各自的加载方法
@@ -670,12 +822,11 @@ var_dump($controller);
         'config' => 'registerConfigBindings',
         'db' => 'registerDatabaseBindings', // 注册 DB 类
         'Illuminate\Contracts\Debug\ExceptionHandler' => 'registerErrorBindings',// 错误处理类 需要重写
-//        'Illuminate\Contracts\Hashing\Hasher' => 'registerHashBindings',
         'log' => 'registerLogBindings',
         'Psr\Log\LoggerInterface' => 'registerLogBindings',
-//        'redis' => 'registerRedisBindings',
         'request' => 'registerRequestBindings', // 生成请求类
-//        'validator' => 'registerValidatorBindings',
+        'events' => 'registerEventBindings',
         'view' => 'registerViewBindings',
+        'url' => 'registerUrlBindings'
     ];
 }
